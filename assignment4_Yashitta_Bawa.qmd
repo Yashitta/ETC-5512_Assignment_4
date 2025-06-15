@@ -259,6 +259,212 @@ duration_clean <- netflix_clean %>%
 
 ## Blog post
 
+### 🎬 Motivation
+
+With Netflix content spanning everything from gritty thrillers to romantic comedies, it’s easy to wonder: **what actually keeps people watching?** This project explores how genres, content type, and show structure relate to viewer engagement. Using real-world viewing data, it uncovers patterns that help explain what makes certain shows binge-worthy while others fade into the background.
+
+------------------------------------------------------------------------
+
+### 📊 Data
+
+The analysis uses two combined datasets:
+
+-   The **Netflix Engagement Report (Jan–Jun 2023)**, which lists total hours viewed for each title globally.
+-   A **Netflix metadata set** from Kaggle, which adds information about each show’s genre, type (TV show or movie), and duration.
+
+After merging and cleaning the data, each row represents a specific show or season, along with how many hours it was watched. The final dataset enables comparisons across genres, formats, and lengths.
+
+------------------------------------------------------------------------
+
+### 📈 Analysis
+
+#### **1. Top Genres by Total Viewing Time**
+
+**Most-Watched Titles on Netflix (Jan–Jun 2023)**
+
+To ground the genre and format patterns in real examples, this table highlights the five most-watched Netflix releases in the first half of 2023. It includes both movies and TV shows, spanning a range of genres. These titles illustrate how varied content — from action-packed films to true crime docuseries — can drive massive engagement. Presenting this alongside the genre and duration breakdowns helps link abstract trends to recognisable shows.
+
+```{r, echo = FALSE}
+# Top 5 most-watched titles
+top_titles <- netflix_clean %>%
+  group_by(title, 
+           type, 
+           release_year) %>%
+  summarise(total_hours = sum(hours_viewed, na.rm = TRUE), 
+            .groups = "drop") %>%
+  arrange(desc(total_hours)) %>%
+  slice_head(n = 5)
+
+# Display as table
+top_titles %>%
+  mutate(total_hours = scales::comma(total_hours)) %>%
+  select(-release_year) %>% 
+  knitr::kable(
+    caption = "Table: Top 5 Most Watched Titles (Jan–Jun 2023)",
+    col.names = c("Title", "Type", "Total Hours Viewed"))
+```
+
+\
+
+To see what types of content dominate attention, total viewing hours were grouped by genre. Genres were extracted from the `listed_in` field and cleaned to avoid duplicates.
+
+```{r, echo = FALSE}
+genre_plot <- ggplot(genre_summary, 
+                     aes(x = listed_in,
+                         y = total_hours, 
+                         fill = listed_in)) +
+  geom_bar(stat = "identity",
+           width = 1, 
+           color = "white") +
+  coord_polar() +
+  scale_y_continuous(labels = scales::comma) +
+  labs(
+    title = "Top 10 Most Watched Genres on Netflix (Jan–Jun 2023)",
+    x = "",
+    y = "Total Hours Viewed") +
+  theme_bw() +
+  theme(
+    axis.text.x = element_text(size = 10, face = "bold"),
+    plot.title = element_text(hjust = 0.5, face = "bold"),
+    legend.position = "none")
+genre_plot
+```
+
+**What it shows:**\
+Comedies and dramas dominated viewer attention in the first half of 2023, each amassing over a billion hours of watch time globally. Family movies and action titles also performed strongly, suggesting that genres with broad, cross-generational appeal tend to attract higher engagement. Meanwhile, more niche categories like horror and sci-fi had lower total viewing hours, though they still featured among the top ten.
+
+------------------------------------------------------------------------
+
+#### **Genre Preferences by Format**
+
+To compare how TV shows and movies perform across genres, titles were grouped by both `type` and `genre`, and total viewing hours were summed. This allowed a direct visual comparison of content preferences across formats.
+
+```{r, echo=FALSE}
+ggplot(genre_by_type, 
+       aes(x = reorder(genre, hours_viewed), 
+           y = hours_viewed, 
+           fill = type)) +
+  geom_col(show.legend = FALSE) +
+  coord_flip() +
+  facet_wrap(~type, 
+             scales = "free") +
+  scale_y_continuous(labels = label_number(scale_cut = cut_short_scale())) +
+  labs(
+    title = "Top 10 Most Watched Genres: Movies vs TV Shows",
+    x = "Genre",
+    y = "Total Hours Viewed") +
+  theme_bw() +
+  theme(
+    strip.text = element_text(face = "bold", size = 12),
+    plot.title = element_text(face = "bold", hjust = 0.5),
+    axis.text.y = element_text(size = 9))
+```
+
+**What it shows:**\
+This chart compares the most-watched genres on Netflix across movies and TV shows. For movies, **comedies** and **dramas** dominated total viewership, followed by action, romance, and thrillers. In contrast, top-performing TV content leaned toward **mysteries**, **horror**, and **sci-fi/fantasy** — genres commonly associated with episodic suspense and longer narrative arcs.
+
+The side-by-side layout highlights how **audience preferences differ by format**. While viewers tend to choose movies for emotionally driven or family-oriented stories, they often turn to TV shows for immersive, suspense-heavy content. This reinforces the idea that **format influences viewing behavior**, with pacing and structure playing key roles in genre appeal.
+
+**Summary Table**\
+While visual plots show broad trends, this table summarises the five most-watched genres **within each format**. Action and comedy dominate the movie side, while crime and docuseries content appear more prominently in the top TV genres — reflecting the structural advantage of episodic storytelling in long-form viewing.
+
+```{r, echo=FALSE}
+# Explode genres
+genre_by_type_top <- netflix_clean %>%
+  separate_rows(listed_in, 
+                sep = ",\\s*") %>%
+  group_by(type, 
+           genre = listed_in) %>%
+  summarise(total_hours = sum(hours_viewed, 
+                              na.rm = TRUE), 
+            .groups = "drop") %>%
+  arrange(type, desc(total_hours)) %>%
+  group_by(type) %>%
+  slice_head(n = 5)
+
+# Format table nicely
+genre_by_type_top %>%
+  mutate(total_hours = scales::comma(total_hours)) %>%
+  knitr::kable(
+    caption = "Table: Top 5 Most Watched Genres by Format",
+    col.names = c("Format", "Genre", "Total Hours Viewed"))
+```
+
+------------------------------------------------------------------------
+
+#### **3. Is Longer Better?**
+
+To explore the relationship between content length and engagement, titles were grouped by format and plotted using separate violin plots: one for movie runtimes (in minutes), and another for TV show durations (in seasons).
+
+```{r, echo=FALSE}
+# Movie Plot
+movie_plot <- duration_clean %>%
+  filter(type == "Movie") %>%
+  ggplot(aes(x = type, 
+             y = duration_num,
+             fill = type)) +
+  geom_violin(alpha = 0.3, 
+              color = NA) +
+  labs(
+    title = "Movie Duration Distribution",
+    y = "Minutes",
+    x = NULL) +
+  scale_fill_manual(values = c("Movie" = "#ff6661")) +
+  theme_bw() +
+  theme(
+    plot.title = element_text(face = "bold",
+                              hjust = 0.5),
+    axis.text.x = element_blank(),
+    axis.ticks.x = element_blank(),
+    legend.position = "none")
+
+# TV Plot
+tv_plot <- duration_clean %>%
+  filter(type == "TV Show") %>%
+  ggplot(aes(x = type, 
+             y = duration_num, 
+             fill = type)) +
+  geom_violin(alpha = 0.3,
+              color = NA) +
+  labs(
+    title = "TV Show Duration Distribution",
+    y = "Seasons",
+    x = NULL) +
+  scale_fill_manual(values = c("TV Show" = "#00bfc4")) +
+  scale_y_continuous(breaks = 1:6, 
+                     limits = c(1, 6)) +
+  theme_bw() +
+  theme(
+    plot.title = element_text(face = "bold", 
+                              hjust = 0.5),
+    axis.text.x = element_blank(),
+    axis.ticks.x = element_blank(),
+    legend.position = "none")
+
+# Combine with patchwork
+movie_plot + tv_plot
+```
+
+**What it shows:**\
+There is no strong or consistent relationship between duration and viewership. Most **movies** clustered around the 90–120 minute mark, with a few shorter and longer outliers — yet both extremes saw varying engagement. **TV shows**, on the other hand, were predominantly one-season formats, with limited variation across the dataset. This suggests that **binge-worthiness isn’t purely driven by length**. Factors such as content quality, genre, release timing, and episodic design likely play a larger role in sustaining viewer attention.
+
+------------------------------------------------------------------------
+
+### 🎯 Conclusion
+
+The analysis suggests that **viewer engagement on Netflix is influenced by a combination of genre, format, and content structure** — not any single factor. While popular genres like **comedies** and **dramas** consistently pull high viewership, others like **horror** and **sci-fi** perform better in specific formats (e.g. TV shows).
+
+The genre breakdown showed distinct preferences between **movies and series**, with audiences leaning toward emotional or family-friendly content in films, and suspenseful, episodic storytelling in shows. The duration comparison further revealed that **most movies fall in the 90–120 minute range**, while **TV shows cluster around 1–2 seasons**, though engagement doesn't necessarily scale with length.
+
+For students exploring data storytelling, this example demonstrates how **public datasets can uncover cultural trends** and viewer behaviour. Simple preprocessing and visualisation choices — like separating genres or handling mixed-duration fields — often unlock deeper narratives hidden beneath the surface.
+
+------------------------------------------------------------------------
+
+### 📚 References
+
+-   Netflix. [*What We Watched: A Netflix Engagement Report*.](https://www.netflix.com/whatwewatched)
+-   Kaggle. [*Netflix Movies and TV Shows Dataset*.](https://www.kaggle.com/datasets/shivamb/netflix-shows)
+
 <!-- Task 3 Tab: Behind the Scenes -  -->
 
 ## Behind the Scenes
