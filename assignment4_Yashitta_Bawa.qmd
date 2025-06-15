@@ -1,0 +1,151 @@
+---
+title: "What Drives Viewer Engagement on Netflix?"
+subtitle: "Assignment 4 ETC5512"
+author: Yashitta Bawa
+format: html
+editor: visual
+message: false
+warning: false
+---
+
+::: panel-tabset
+<!-- Task 1 Tab: Data and Documenting -->
+
+## Data Details
+
+### 🧠 Research Question
+
+This project explores the question: **What drives viewer engagement on Netflix?**
+
+The aim is to identify which types of content—such as genres, release formats, or show types—tend to receive the highest viewership. In particular, the analysis considers:
+
+-   Whether certain genres (e.g. documentaries, thrillers, reality) attract more sustained attention\
+-   Whether newer titles perform better than older ones\
+-   What common characteristics are shared by the most-watched shows
+
+This question was chosen because streaming services like Netflix play a large role in everyday entertainment. Understanding what makes certain content more engaging can offer useful insights into viewer preferences, binge-watching trends, and content design.
+
+------------------------------------------------------------------------
+
+### 📁 The Data
+
+Two datasets were used in this project:
+
+1.  **Netflix Engagement Report (Jan–Jun 2023)**\
+    This dataset, published by Netflix, includes total hours watched globally for each title, along with release dates. It reflects real-world viewership patterns and serves as a direct measure of audience engagement.
+
+2.  **Netflix Titles Metadata (from Kaggle)**\
+    This dataset includes descriptive information about Netflix content such as title, type (TV show or movie), duration (either runtime in minutes or season count), genre categories, and release year.
+
+These datasets were chosen because they are **publicly available**, contain the **relevant variables** needed to explore the research question, and are **up-to-date** as of 2023.
+
+They are suitable for the intended analysis because: - The engagement data directly measures viewer attention - The metadata enables grouping by format and genre - Both are observational and compatible in structure after cleaning
+
+**Licensing**:
+
+-   The engagement report is published by Netflix and freely downloadable from the Netflix What We Watched site
+
+-   The titles dataset is available on Kaggle under a public license
+
+------------------------------------------------------------------------
+
+### 🛠️ Data Collection and Preparation
+
+**Download Process:**
+
+-   The engagement data was downloaded as an Excel spreadsheet from the Netflix What We Watched website.
+
+-   The metadata was downloaded in CSV format from Kaggle.
+
+**Data Cleaning and Processing:**
+
+-   The engagement report included a non-tabular header section, which was skipped. - Column names were cleaned and standardised using the `janitor` package.
+
+-   The `title` column was standardised across both datasets by converting to lowercase and trimming white-space.
+
+-   Only relevant variables were retained, including title, hours viewed, release date, genre, and type.
+
+-   The two datasets were merged using a cleaned `title` column.
+
+-   Some shows appear in the engagement data multiple times (e.g. one row per season). These were retained for more granular analysis.
+
+-   The `duration` column reflects minutes for movies and season count for TV shows. This limits direct comparisons across formats.
+
+These steps ensured the dataset was clean, merged, and ready for structured analysis and visualisation.
+
+```{r}
+# Loaded required libraries
+library(readr)
+library(readxl)
+library(here)
+library(janitor)
+library(dplyr)
+library(stringr)
+library(lubridate)
+library(tidyr)
+library(ggplot2)
+library(plotly)
+library(scales)
+library(ggridges)
+library(patchwork)
+
+# Loaded the datasets
+titles <- read_csv(here("data/netflix_titles.csv")) %>% 
+  clean_names()
+engagement_report <- read_excel(here("data/Netflix_Engagement_Report.xlsx"), 
+                                     skip = 5) %>% 
+  clean_names()
+
+# Standardised the titles for merging
+titles <- titles %>%
+  mutate(title_clean = str_to_lower(str_trim(title)))
+
+engagement_report <- engagement_report %>%
+  mutate(title_clean = str_to_lower(str_trim(title)),
+    release_year = lubridate::year(release_date))
+
+# Merged datasets using a left join
+netflix_clean <- left_join(engagement_report, titles, by = "title_clean") %>%
+  filter(!is.na(type), !is.na(duration), !is.na(listed_in)) %>%
+  mutate(
+    release_year = lubridate::year(release_date)) %>%
+  select(title = title.x,
+         release_date,
+         hours_viewed,
+         release_year,
+         type, 
+         duration, 
+         listed_in)
+
+# Added a new column with season removed
+netflix_clean <- netflix_clean %>%
+  mutate(base_title = str_remove(title, ": Season \\d+|: Limited Series"))
+
+# Group by base title + genre/type and summarise
+netflix_grouped <- netflix_clean %>%
+  group_by(base_title, type, listed_in) %>%
+  summarise(
+    total_hours = sum(hours_viewed, na.rm = TRUE),
+    .groups = "drop")
+
+# Separated movie duration (in minutes) and show duration (season count)
+netflix_clean <- netflix_clean %>%
+  mutate(
+    duration_num = parse_number(duration),
+    duration_type = case_when(
+      str_detect(duration, "min") ~ "minutes",
+      str_detect(duration, "Season") ~ "seasons",
+      TRUE ~ "unknown"))
+```
+
+------------------------------------------------------------------------
+
+<!-- Task 2 Tab: Writing your blogpost -->
+
+## Blog post
+
+<!-- Task 3 Tab: Behind the Scenes -  -->
+
+## Behind the Scenes
+
+:::
