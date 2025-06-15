@@ -469,4 +469,25 @@ For students exploring data storytelling, this example demonstrates how **public
 
 ## Behind the Scenes
 
+### **🧹 Genre Cleaning and Duration Parsing**
+
+**Tell us about a part(s) of your data processing or analysis that weren’t “sexy” and wouldn’t typically be included in a blog post. (e.g. Was there any data drudgery or time intensive wrangling? Were there any repetitive tasks or manual tasks? If it was easy, describe what made it easy?)**
+
+A surprising amount of time went into cleaning the `duration` and `listed_in` columns. The genre field contained comma-separated values, which meant entries had to be split, flattened, and reassigned before any meaningful grouping could happen. Similarly, standardising the duration format required parsing mixed strings like “90 min” and “1 Season” into clean numeric values. These weren’t difficult, but they were repetitive and fiddly — and wouldn’t be obvious from the final visuals.
+
+------------------------------------------------------------------------
+
+### **🧩 Redesigning Visuals and Adjusting Scope**
+
+**Were there any challenges that you faced in conducting this analysis? These may take the form of data limitations or coding challenges. (e.g. Was there anything in your analysis that you were not anticipating when you started? Did you have to change your intended scope? Did you need to master a new skill? Were there any problems you were proud of solving?)**
+
+There were multiple rounds of visualisation redesigns. The original plan was to use radar and sunburst plots, but both were dropped — either because they didn’t render correctly or didn’t support comparison well. Plotting duration was especially tricky because the unit was inconsistent (minutes for movies, seasons for shows). Getting those into a shared structure required recoding the logic several times. In the end, simple violin plots gave the most readable output.
+
+------------------------------------------------------------------------
+
+### **🚀 Opportunities for Future Expansion**
+
+**Tell us about any imperfect parts of your work or how you would like to expand this analysis in future? (We don’t expect you to solve everything in one assignment.)**
+
+The dataset only included total viewing hours and lacked contextual metadata such as drop-off rates or regional viewing patterns. As a result, it was difficult to tell whether high engagement reflected popularity, rewatchability, or algorithmic promotion. In the future, it would be useful to bring in complementary data — such as country-level trends, viewer completion rates, or IMDb scores — to round out the picture and understand *why* certain shows succeeded.
 :::
