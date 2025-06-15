@@ -140,6 +140,121 @@ netflix_clean <- netflix_clean %>%
 
 ------------------------------------------------------------------------
 
+### 📊 Dataset Creation for Visualisation
+
+**Genre Breakdown: Most Watched Categories Overall**
+
+To understand which genres attract the most viewership, multi-genre entries were separated and total hours viewed were aggregated for each individual genre.
+
+To compare trends across formats, the dataset was further grouped by both `type` (Movie or TV Show) and `genre`. The top 10 genres were selected separately for each format based on total viewing hours, then combined into a single dataset to allow visual comparison. While some genres appeared in both lists (e.g. Dramas, Sci-Fi & Fantasy), others were format-specific — such as Crime TV Shows or Romantic Movies.
+
+This preparation enabled a clear side-by-side breakdown of audience preferences by format, shown through a faceted bar chart in the blog post tab. The plot offers insight into which genres perform better within each format and highlights how structural differences in content affect viewership.
+
+```{r}
+genre_summary <- netflix_clean %>%
+  separate_rows(listed_in, sep = ",\\s*") %>%
+  group_by(listed_in) %>%
+  summarise(total_hours = sum(hours_viewed, na.rm = TRUE)) %>%
+  arrange(desc(total_hours)) %>%
+  slice_head(n = 10)
+
+# Preprocess genre order
+genre_summary <- genre_summary %>%
+  mutate(listed_in = factor(listed_in, 
+                            levels = listed_in[order(total_hours)]))
+```
+
+**Genre Preferences by Format**
+
+To compare viewership patterns between TV shows and movies, titles were grouped by type and summary statistics such as mean and median hours viewed were calculated.
+
+To further investigate genre-based viewing patterns across both formats, titles were grouped by both `type` and `genre`, and total viewing hours were aggregated.\
+Separate top 10 genres were selected for each format to highlight the most popular content, and overlapping genres were retained for comparison.
+
+This dataset was used to create a **side-by-side faceted bar chart**, showing the top genres by total hours viewed for **movies** on the left and **TV shows** on the right.\
+The layout helps highlight which genres perform better within each content format.
+
+```{r}
+format_summary <- netflix_clean %>%
+  group_by(type) %>%
+  summarise(
+    mean_hours = mean(hours_viewed, na.rm = TRUE),
+    median_hours = median(hours_viewed, na.rm = TRUE),
+    count = n())
+
+# Full summary of genres by format
+genre_all <- netflix_clean %>%
+  separate_rows(listed_in, sep = ",\\s*") %>%
+  group_by(type, genre = listed_in) %>%
+  summarise(hours_viewed = sum(hours_viewed, na.rm = TRUE), .groups = "drop")
+
+# Top 10 Movie genres
+top_movie_genres <- genre_all %>%
+  filter(type == "Movie") %>%
+  arrange(desc(hours_viewed)) %>%
+  slice_head(n = 10) %>%
+  pull(genre)
+
+# Top 10 TV genres
+top_tv_genres <- genre_all %>%
+  filter(type == "TV Show") %>%
+  arrange(desc(hours_viewed)) %>%
+  slice_head(n = 10) %>%
+  pull(genre)
+
+# Combine all 20 genres (with overlap if any)
+selected_genres <- union(top_movie_genres, top_tv_genres)
+
+# Final dataset: includes Movie + TV rows for those 20 genres
+genre_by_type <- genre_all %>%
+  filter(genre %in% selected_genres)
+```
+
+**Duration vs. Format**
+
+To explore how content length varies between movies and TV shows, the `duration` column was cleaned and separated into two distinct units: **minutes** (for movies) and **seasons** (for shows). These values were extracted numerically and stored in a new column called `duration_num`.
+
+Entries marked as "other" or with missing type/duration values were filtered out. This created a consistent dataset for comparing structural differences in content length.
+
+The dataset was then split by format (`Movie` vs `TV Show`) and visualised using **violin plots**. Each plot shows the distribution of durations across titles, allowing insight into how runtime conventions differ by format.
+
+For instance, movies typically fall within the 90–120 minute range, while most TV shows cluster around 1–2 seasons. This transformation supports a focused visualisation of **duration norms** and sets the foundation for analysing their relationship with viewer engagement.
+
+```{r}
+duration_clean <- netflix_clean %>%
+  mutate(
+    duration_num = readr::parse_number(duration),
+    duration_type = case_when(
+      str_detect(duration, "min") ~ "minutes",
+      str_detect(duration, "Season") ~ "seasons",
+      TRUE ~ "other")) %>%
+  filter(!is.na(duration_num))
+
+# Clean duration data
+duration_clean <- netflix_clean %>%
+  filter(!is.na(duration), 
+         !is.na(type)) %>%
+  mutate(
+    duration_num = case_when(
+      str_detect(duration, "min") ~ parse_number(duration),
+      str_detect(duration, "Season") ~ parse_number(duration),
+      TRUE ~ NA_real_),
+    duration_unit = case_when(
+      str_detect(duration, "min") ~ "Minutes",
+      str_detect(duration, "Season") ~ "Seasons",
+      TRUE ~ "Other")) %>%
+  filter(!is.na(duration_num), 
+         duration_unit != "Other")
+```
+
+------------------------------------------------------------------------
+
+### 📚 References
+
+-   Netflix. *What We Watched: A Netflix Engagement Report*. Retrieved from: https://www.netflix.com/whatwewatched\
+-   Shivamb. *Netflix Movies and TV Shows Dataset*. Retrieved from: https://www.kaggle.com/datasets/shivamb/netflix-shows\
+-   R Packages used: `readxl`, `readr`, `dplyr`, `stringr`, `janitor`, `lubridate`, `here`, `tidyr`
+
 <!-- Task 2 Tab: Writing your blogpost -->
 
 ## Blog post
