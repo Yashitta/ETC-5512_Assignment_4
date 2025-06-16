@@ -1,0 +1,191 @@
+/* Apply clean modern font */
+body {
+  font-family: 'Segoe UI', Roboto, sans-serif;
+  line-height: 1.6;
+  background-color: #111E32;
+  color: #f0f0f0;
+  padding-bottom: 2rem;
+}
+
+/* Style for headings */
+h1 {
+  color: #e50914;
+  font-size: 2.5rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-family: 'Helvetica Neue', Impact, sans-serif;
+  text-align: center;
+}
+h2, h3 {
+  color: #ff5a5f;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 4px;
+}
+.emoji {
+  font-size: 1.2em;
+  margin-right: 0.5em;
+}
+strong, b {
+  color: #fff;
+}
+
+p, li {
+  text-align: justify;
+  text-justify: inter-word;
+}
+
+/* Make code blocks look cleaner */
+p code, li code, span code  {
+  background-color: #ff5a5f !important;
+  color: white !important;
+  padding: 0.2em 0.5em;
+  border-radius: 0.5em;
+  font-size: 0.95em;
+  font-weight: 500;
+  border: none;
+}
+pre.sourceCode {
+  border: none !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+code.sourceCode {
+  border: none !important;
+  background: transparent !important;
+  padding: 0 !important;
+  box-shadow: none !important;
+}
+.sourceCode {
+  border: 2px solid #f18973 !important;
+  border-radius: 6px !important;
+  background-color: #fed3c7 !important;
+  padding: 1em;
+  margin: 1em 0;
+  position: relative;
+}
+.sourceCode .code-copy-button {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  border-radius: 6px;
+  padding: 0.3rem 0.5rem;
+  font-size: 0.75rem;
+  color: white;
+  cursor: pointer;
+}
+code.sourceCode {
+  border: none !important;
+  background: transparent !important;
+  padding: 0 !important;
+  box-shadow: none !important;
+}
+pre code {
+  background-color: transparent !important;
+  color: #1a1a1a;
+  display: block;
+  overflow-x: auto;
+  font-family: "Courier New", monospace;
+}
+
+/* Improve table appearance */
+table {
+  background-color: rgba(255, 255, 255, 0.03);
+  border-collapse: collapse;
+  width: 100%;
+  margin: 1rem 0;
+  color: #f0f0f0;
+}
+th, td {
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  padding: 10px;
+  text-align: left;
+}
+thead {
+  background-color: #e50914;
+  color: white;
+}
+
+/* Tab styling */
+.panel-tabset .nav-tabs {
+  border-bottom: none !important;
+  margin-bottom: -2px !important;
+  padding-bottom: 0 !important;
+}
+.panel-tabset .tab-content {
+  margin-top: -2px !important;
+  margin-bottom: -2px !important;
+  padding: 0 !important;
+  border-top: 2px solid #e50914;
+  border-left: 1px solid #e50914;
+  border-right: 1px solid #e50914;
+  border-bottom: 1px solid #e50914;
+  border-radius: 0 0 8px 8px;
+}
+.panel-tabset .nav-tabs .nav-link.active {
+  background-color: #e50914;
+  border-color: #e50914;
+  color: white;
+  box-shadow: inset 0 -2px 0 #e50914;
+}
+.panel-tabset .nav-tabs .nav-link {
+  background-color: rgba(255,255,255,0.05);
+  border: none;
+  color: #f0f0f0;
+  font-weight: 500;
+  margin-right: 5px;
+  border-radius: 8px 8px 0 0;
+  transition: all 0.3s ease-in-out;
+}
+.panel-tabset .nav-tabs .nav-link:hover {
+  box-shadow: 0 0 10px #e50914, 0 0 5px #e50914;
+  color: white;
+  cursor: pointer;
+  transform: translateY(-1px);
+}
+.panel-tabset .tab-content > .tab-pane {
+  background-color: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 0 0 8px 8px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+}
+.panel-tabset {
+  width: 100%;
+  margin-bottom: 0 !important;
+  padding-top: 0 !important;
+}
+
+a {
+  color: #ff5a5f;
+  text-decoration: underline;
+}
+
+a:hover {
+  color: #ff7d7f;
+  text-decoration: underline;
+}
+
+.quarto-figure,
+.figure {
+  text-align: center;
+  margin: 2rem auto;
+}
+
+.quarto-figure > img,
+.figure > img,
+p > img {
+  display: block;
+  margin: 2rem auto;
+  border: 1px solid #e50914 !important;
+  border-radius: 10px !important;
+  background-color: #e50914 !important;
+  padding: 0.25rem !important;
+  max-width: 100%;
+  height: auto;
+  box-sizing: border-box;
+}

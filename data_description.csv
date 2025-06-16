@@ -1,0 +1,11 @@
+﻿Variable Name,Description,Type,Units / Levels,Derived From,Notes
+title,"Name of the content as listed in the engagement dataset (e.g., show or movie title)",String,"Official Netflix title (e.g., Stranger Things, Extraction 2)",Netflix Engagement Report,Used as the main identifier before merging and standardising
+release_date,Official Netflix release date of the content in date format,Date,YYYY-MM-DD,Netflix Engagement Report,Used to derive release_year
+release_year,Year extracted from release_date for temporal analysis,Numeric,Year,release_date,Used to explore recency of titles
+hours_viewed,Total number of hours the content was watched globally (Jan–Jun 2023),Numeric,Hours,Netflix Engagement Report,Primary engagement measure
+type,Format of the title indicating whether it is a Movie or TV Show,Categorical,"Movie, TV Show",Kaggle metadata,Used to compare formats in visualisations
+duration,"Raw duration value showing runtime (e.g., ""90 min"") or season count",String,Mixed,Kaggle metadata,Parsed into numeric form
+duration_num,Parsed numeric version of duration for use in plots and filtering,Numeric,Minutes or Seasons,duration,Used in violin plots
+duration_unit,"Indicates the unit of duration, either ""Minutes"" or ""Seasons""",Categorical,"Minutes, Seasons",duration,Used to split duration by content type
+listed_in,"Genre categories assigned to each title, as a comma-separated list",Categorical (multi),"E.g., Drama, Comedy, Sci-Fi",Kaggle metadata,Split into multiple rows for genre analysis
+base_title,Cleaned version of title with season labels removed for grouping,String,"Cleaned title without season suffix (e.g., Stranger Things, The Witcher)",title,Used to group multiple seasons under a single show

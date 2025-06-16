@@ -2,7 +2,10 @@
 title: "What Drives Viewer Engagement on Netflix?"
 subtitle: "Assignment 4 ETC5512"
 author: Yashitta Bawa
-format: html
+format:
+  html:
+    theme: flatly
+    css: styles.css
 editor: visual
 message: false
 warning: false
@@ -17,13 +20,13 @@ warning: false
 
 This project explores the question: **What drives viewer engagement on Netflix?**
 
-The aim is to identify which types of content—such as genres, release formats, or show types—tend to receive the highest viewership. In particular, the analysis considers:
+The goal is to determine which types of content—such as genres, release formats, or show categories—tend to attract the highest viewership. Specifically, the analysis investigates:
 
--   Whether certain genres (e.g. documentaries, thrillers, reality) attract more sustained attention\
+-   Whether certain genres (e.g., documentaries, thrillers, reality shows) sustain more viewer attention\
 -   Whether newer titles perform better than older ones\
 -   What common characteristics are shared by the most-watched shows
 
-This question was chosen because streaming services like Netflix play a large role in everyday entertainment. Understanding what makes certain content more engaging can offer useful insights into viewer preferences, binge-watching trends, and content design.
+This question was selected because streaming platforms like Netflix play a major role in everyday entertainment. Gaining insight into what makes certain content more engaging can help illuminate viewer preferences, binge-watching behavior, and content design strategies.
 
 ------------------------------------------------------------------------
 
@@ -32,18 +35,24 @@ This question was chosen because streaming services like Netflix play a large ro
 Two datasets were used in this project:
 
 1.  **Netflix Engagement Report (Jan–Jun 2023)**\
-    This dataset, published by Netflix, includes total hours watched globally for each title, along with release dates. It reflects real-world viewership patterns and serves as a direct measure of audience engagement.
+    This dataset, published by Netflix, includes total hours watched globally for each title, along with release dates. It reflects real-world viewership patterns and provides a direct measure of audience engagement.
 
 2.  **Netflix Titles Metadata (from Kaggle)**\
-    This dataset includes descriptive information about Netflix content such as title, type (TV show or movie), duration (either runtime in minutes or season count), genre categories, and release year.
+    This dataset contains descriptive information about Netflix content, including title, type (TV show or movie), duration (either runtime in minutes or number of seasons), genre categories, and release year.
 
-These datasets were chosen because they are **publicly available**, contain the **relevant variables** needed to explore the research question, and are **up-to-date** as of 2023.
+These datasets were selected because they are **publicly available**, nclude the **relevant variables** needed to address the research question, and are **up-to-date** as of 2023.
 
-They are suitable for the intended analysis because: - The engagement data directly measures viewer attention - The metadata enables grouping by format and genre - Both are observational and compatible in structure after cleaning
+They are appropriate for the intended analysis because:
+
+-   The engagement data directly captures viewer attention
+
+-   The metadata allows for grouping by format and genre
+
+-   Both datasets are observational and structurally compatible after cleanings
 
 **Licensing**:
 
--   The engagement report is published by Netflix and freely downloadable from the Netflix What We Watched site
+-   The engagement report is published by Netflix and is freely downloadable from the Netflix What We Watched site
 
 -   The titles dataset is available on Kaggle under a public license
 
@@ -55,23 +64,25 @@ They are suitable for the intended analysis because: - The engagement data direc
 
 -   The engagement data was downloaded as an Excel spreadsheet from the Netflix What We Watched website.
 
--   The metadata was downloaded in CSV format from Kaggle.
+-   The titles data was downloaded in CSV format from Kaggle.
 
 **Data Cleaning and Processing:**
 
--   The engagement report included a non-tabular header section, which was skipped. - Column names were cleaned and standardised using the `janitor` package.
+-   The engagement report included a non-tabular header section, which was skipped.
 
--   The `title` column was standardised across both datasets by converting to lowercase and trimming white-space.
+-   Column names were cleaned and standardized using the `janitor` package.
+
+-   The `title` column was standardized across both datasets by converting text to lowercase and trimming white space.
 
 -   Only relevant variables were retained, including title, hours viewed, release date, genre, and type.
 
--   The two datasets were merged using a cleaned `title` column.
+-   The two datasets were merged using the cleaned `title` column.
 
--   Some shows appear in the engagement data multiple times (e.g. one row per season). These were retained for more granular analysis.
+-   Some shows appeared multiple times in the engagement data (e.g., one row per season). These entries were retained for more granular analysis.
 
--   The `duration` column reflects minutes for movies and season count for TV shows. This limits direct comparisons across formats.
+-   The `duration` column indicates runtime in minutes for movies and season count for TV shows, which limits direct comparisons across formats.
 
-These steps ensured the dataset was clean, merged, and ready for structured analysis and visualisation.
+These steps ensured the datasets were clean, merged, and ready for structured analysis and visualization.
 
 ```{r}
 # Loaded required libraries
@@ -144,11 +155,11 @@ netflix_clean <- netflix_clean %>%
 
 **Genre Breakdown: Most Watched Categories Overall**
 
-To understand which genres attract the most viewership, multi-genre entries were separated and total hours viewed were aggregated for each individual genre.
+To identify which genres attract the highest viewership, multi-genre entries were separated, and total hours viewed were aggregated for each individual genre.
 
-To compare trends across formats, the dataset was further grouped by both `type` (Movie or TV Show) and `genre`. The top 10 genres were selected separately for each format based on total viewing hours, then combined into a single dataset to allow visual comparison. While some genres appeared in both lists (e.g. Dramas, Sci-Fi & Fantasy), others were format-specific — such as Crime TV Shows or Romantic Movies.
+To explore trends across formats, the dataset was further grouped by both `type` (Movie or TV Show) and `genre`. The top 10 genres for each format were selected based on total viewing hours, then combined into a single dataset to allow visual comparison. While some genres appeared in both lists (e.g., Dramas, Sci-Fi & Fantasy), others were format-specific—such as Crime TV Shows or Romantic Movies.
 
-This preparation enabled a clear side-by-side breakdown of audience preferences by format, shown through a faceted bar chart in the blog post tab. The plot offers insight into which genres perform better within each format and highlights how structural differences in content affect viewership.
+This preparation enabled a clear side-by-side breakdown of audience preferences by format, visualised through a faceted bar chart in the blog post tab. The plot reveals which genres perform better within each format and illustrates how structural differences in content influence viewership.
 
 ```{r}
 genre_summary <- netflix_clean %>%
@@ -166,13 +177,15 @@ genre_summary <- genre_summary %>%
 
 **Genre Preferences by Format**
 
-To compare viewership patterns between TV shows and movies, titles were grouped by type and summary statistics such as mean and median hours viewed were calculated.
+To compare viewership patterns between TV shows and movies, titles were grouped by type, and summary statistics—such as mean and median hours viewed—were calculated.
 
-To further investigate genre-based viewing patterns across both formats, titles were grouped by both `type` and `genre`, and total viewing hours were aggregated.\
-Separate top 10 genres were selected for each format to highlight the most popular content, and overlapping genres were retained for comparison.
+To further examine genre-based viewing trends across formats, titles were grouped by both `type` and `genre`, and total viewing hours were aggregated.\
 
-This dataset was used to create a **side-by-side faceted bar chart**, showing the top genres by total hours viewed for **movies** on the left and **TV shows** on the right.\
-The layout helps highlight which genres perform better within each content format.
+The top 10 genres for each format were then selected to showcase the most popular categories, with overlapping genres retained to allow comparison.
+
+This data was used to create a **side-by-side faceted bar chart**, displaying the top genres by total hours viewed for **movies** on the left and **TV shows** on the right.\
+
+The layout highlights which genres perform better within each content format.
 
 ```{r}
 format_summary <- netflix_clean %>%
@@ -212,13 +225,13 @@ genre_by_type <- genre_all %>%
 
 **Duration vs. Format**
 
-To explore how content length varies between movies and TV shows, the `duration` column was cleaned and separated into two distinct units: **minutes** (for movies) and **seasons** (for shows). These values were extracted numerically and stored in a new column called `duration_num`.
+To explore how content length varies between movies and TV shows, the `duration` column was cleaned and split into two distinct units: **minutes** (for movies) and **seasons** (for TV shows). These values were extracted numerically and stored in a new column called `duration_num`.
 
-Entries marked as "other" or with missing type/duration values were filtered out. This created a consistent dataset for comparing structural differences in content length.
+Entries labelled as "other" or missing type/duration values were filtered out to create a consistent dataset for comparing structural differences in content length.
 
-The dataset was then split by format (`Movie` vs `TV Show`) and visualised using **violin plots**. Each plot shows the distribution of durations across titles, allowing insight into how runtime conventions differ by format.
+The cleaned dataset was then split by format (`Movie` vs `TV Show`) and visualised using **violin plots**. Each plot displays the distribution of durations across titles, offering insight into how runtime conventions differ by format.
 
-For instance, movies typically fall within the 90–120 minute range, while most TV shows cluster around 1–2 seasons. This transformation supports a focused visualisation of **duration norms** and sets the foundation for analysing their relationship with viewer engagement.
+For instance, movies typically range from 90–120 minutes, while most TV shows cluster around 1–2 seasons. This transformation supports a focused visualisation of **duration norms** and lays the foundation for analysing their relationship with viewer engagement.
 
 ```{r}
 duration_clean <- netflix_clean %>%
@@ -251,9 +264,15 @@ duration_clean <- netflix_clean %>%
 
 ### 📚 References
 
--   Netflix. *What We Watched: A Netflix Engagement Report*. Retrieved from: https://www.netflix.com/whatwewatched\
--   Shivamb. *Netflix Movies and TV Shows Dataset*. Retrieved from: https://www.kaggle.com/datasets/shivamb/netflix-shows\
+-   Netflix. *What We Watched: A Netflix Engagement Report*. Retrieved from: [*Netflix*](https://about.netflix.com/en/news/what-we-watched-a-netflix-engagement-report)\
+-   Shivamb. *Netflix Movies and TV Shows Dataset*. Retrieved from: [*Kaggle*](https://www.kaggle.com/datasets/shivamb/netflix-shows)\
 -   R Packages used: `readxl`, `readr`, `dplyr`, `stringr`, `janitor`, `lubridate`, `here`, `tidyr`
+
+------------------------------------------------------------------------
+
+### 🤖 AI Acknowledgment
+
+Parts of this project, including text refinement, paraphrasing, and grammar correction, were supported by OpenAI’s ChatGPT. The AI was used to enhance clarity, coherence, and flow in the written sections, while all core ideas, analyses, and interpretations remain the original work of the author. Here is the link for the [ChatGPT Query.](https://chatgpt.com/share/68502201-27d0-800c-8cb0-023fc4eb1f2d)
 
 <!-- Task 2 Tab: Writing your blogpost -->
 
@@ -261,18 +280,19 @@ duration_clean <- netflix_clean %>%
 
 ### 🎬 Motivation
 
-With Netflix content spanning everything from gritty thrillers to romantic comedies, it’s easy to wonder: **what actually keeps people watching?** This project explores how genres, content type, and show structure relate to viewer engagement. Using real-world viewing data, it uncovers patterns that help explain what makes certain shows binge-worthy while others fade into the background.
+With Netflix offering everything from gritty thrillers to romantic comedies, it’s natural to wonder: **what actually keeps people watching?**\
+This project investigates how genre, content type, and show structure influence viewer engagement. By leveraging real-world viewing data, it uncovers patterns that help explain why some shows become binge-worthy while others fade into the background.
 
 ------------------------------------------------------------------------
 
 ### 📊 Data
 
-The analysis uses two combined datasets:
+The analysis is based on two combined datasets:
 
--   The **Netflix Engagement Report (Jan–Jun 2023)**, which lists total hours viewed for each title globally.
--   A **Netflix metadata set** from Kaggle, which adds information about each show’s genre, type (TV show or movie), and duration.
+-   The **Netflix Engagement Report (Jan–Jun 2023)**, which lists total global viewing hours for each title.
+-   A **Netflix title dataset** from Kaggle, providing additional details such as genre, content type (TV show or movie), and duration.
 
-After merging and cleaning the data, each row represents a specific show or season, along with how many hours it was watched. The final dataset enables comparisons across genres, formats, and lengths.
+After merging and cleaning, each row in the final dataset represents a specific show or season along with its total hours viewed. This structured dataset allows for meaningful comparisons across genres, formats, and content lengths.
 
 ------------------------------------------------------------------------
 
@@ -282,7 +302,7 @@ After merging and cleaning the data, each row represents a specific show or seas
 
 **Most-Watched Titles on Netflix (Jan–Jun 2023)**
 
-To ground the genre and format patterns in real examples, this table highlights the five most-watched Netflix releases in the first half of 2023. It includes both movies and TV shows, spanning a range of genres. These titles illustrate how varied content — from action-packed films to true crime docuseries — can drive massive engagement. Presenting this alongside the genre and duration breakdowns helps link abstract trends to recognisable shows.
+To ground the genre and format patterns in real examples, this table showcases the five most-watched Netflix releases from the first half of 2023. It includes both movies and TV shows across a variety of genres. These titles demonstrate how diverse content—from action-packed films to true crime docuseries—can generate massive viewer engagement. Displaying this alongside the genre and duration breakdowns helps connect broader trends to familiar, recognisable shows.
 
 ```{r, echo = FALSE}
 # Top 5 most-watched titles
@@ -306,7 +326,7 @@ top_titles %>%
 
 \
 
-To see what types of content dominate attention, total viewing hours were grouped by genre. Genres were extracted from the `listed_in` field and cleaned to avoid duplicates.
+To understand what types of content dominate viewer attention, total viewing hours were grouped by genre. Genres were extracted from the `listed_in` field and cleaned to remove duplicates.
 
 ```{r, echo = FALSE}
 genre_plot <- ggplot(genre_summary, 
@@ -315,29 +335,33 @@ genre_plot <- ggplot(genre_summary,
                          fill = listed_in)) +
   geom_bar(stat = "identity",
            width = 1, 
-           color = "white") +
-  coord_polar() +
-  scale_y_continuous(labels = scales::comma) +
+           color = "white",
+           show.legend = FALSE) +
+  coord_polar(clip = "off", 
+              start = 0) +
+  scale_y_continuous(labels = NULL) +
   labs(
-    title = "Top 10 Most Watched Genres on Netflix (Jan–Jun 2023)",
+    title = "Top 10 Most Watched Genres on Netflix by Hours Watched",
     x = "",
-    y = "Total Hours Viewed") +
-  theme_bw() +
+    y = "") +
+  theme_minimal() +
   theme(
     axis.text.x = element_text(size = 10, face = "bold"),
     plot.title = element_text(hjust = 0.5, face = "bold"),
-    legend.position = "none")
+    legend.position = "none",
+    panel.grid = element_line(color = "grey", linetype = "dashed"),
+    plot.margin = margin(1, 1, 1, 1, "cm"))
 genre_plot
 ```
 
 **What it shows:**\
-Comedies and dramas dominated viewer attention in the first half of 2023, each amassing over a billion hours of watch time globally. Family movies and action titles also performed strongly, suggesting that genres with broad, cross-generational appeal tend to attract higher engagement. Meanwhile, more niche categories like horror and sci-fi had lower total viewing hours, though they still featured among the top ten.
+Comedies and dramas led in viewer engagement during the first half of 2023, each accumulating over a billion hours of global watch time. Family movies and action titles also performed strongly, indicating that genres with broad, cross-generational appeal tend to attract more viewers. In contrast, niche categories like horror and sci-fi saw lower total viewing hours, though they still ranked among the top ten.
 
 ------------------------------------------------------------------------
 
-#### **Genre Preferences by Format**
+#### **2. Genre Preferences by Format**
 
-To compare how TV shows and movies perform across genres, titles were grouped by both `type` and `genre`, and total viewing hours were summed. This allowed a direct visual comparison of content preferences across formats.
+To compare how TV shows and movies perform across genres, titles were grouped by both `type` and `genre`, and total viewing hours were aggregated. This enabled a direct visual comparison of content preferences across formats.
 
 ```{r, echo=FALSE}
 ggplot(genre_by_type, 
@@ -361,12 +385,12 @@ ggplot(genre_by_type,
 ```
 
 **What it shows:**\
-This chart compares the most-watched genres on Netflix across movies and TV shows. For movies, **comedies** and **dramas** dominated total viewership, followed by action, romance, and thrillers. In contrast, top-performing TV content leaned toward **mysteries**, **horror**, and **sci-fi/fantasy** — genres commonly associated with episodic suspense and longer narrative arcs.
+This chart compares the most-watched genres on Netflix across movies and TV shows. For movies, **comedies** and **dramas** led in total viewership, followed by action, romance, and thrillers. In contrast, top-performing TV content leaned toward **mysteries**, **horror**, and **sci-fi/fantasy** — genres often associated with episodic suspense and extended story arcs.
 
-The side-by-side layout highlights how **audience preferences differ by format**. While viewers tend to choose movies for emotionally driven or family-oriented stories, they often turn to TV shows for immersive, suspense-heavy content. This reinforces the idea that **format influences viewing behavior**, with pacing and structure playing key roles in genre appeal.
+The side-by-side layout clearly illustrates how **audience preferences vary by format**. While viewers tend to choose movies for emotionally driven or family-friendly stories, they often turn to TV shows for immersive, suspense-heavy narratives. This supports the idea that **format influences viewing behaviour**, with pacing and structure playing key roles in shaping genre appeal.
 
 **Summary Table**\
-While visual plots show broad trends, this table summarises the five most-watched genres **within each format**. Action and comedy dominate the movie side, while crime and docuseries content appear more prominently in the top TV genres — reflecting the structural advantage of episodic storytelling in long-form viewing.
+While visual plots capture overall trends, this table highlights the five most-watched genres **within each format**. Action and comedy dominate the movie category, whereas crime and docuseries genres appear more frequently in top-performing TV content—reflecting the structural strengths of episodic storytelling in long-form viewing.
 
 ```{r, echo=FALSE}
 # Explode genres
@@ -394,7 +418,7 @@ genre_by_type_top %>%
 
 #### **3. Is Longer Better?**
 
-To explore the relationship between content length and engagement, titles were grouped by format and plotted using separate violin plots: one for movie runtimes (in minutes), and another for TV show durations (in seasons).
+To examine the relationship between content length and viewer engagement, titles were grouped by format and visualised using separate violin plots—one for movie runtimes (in minutes) and another for TV show durations (in seasons).
 
 ```{r, echo=FALSE}
 # Movie Plot
@@ -446,30 +470,30 @@ movie_plot + tv_plot
 ```
 
 **What it shows:**\
-There is no strong or consistent relationship between duration and viewership. Most **movies** clustered around the 90–120 minute mark, with a few shorter and longer outliers — yet both extremes saw varying engagement. **TV shows**, on the other hand, were predominantly one-season formats, with limited variation across the dataset. This suggests that **binge-worthiness isn’t purely driven by length**. Factors such as content quality, genre, release timing, and episodic design likely play a larger role in sustaining viewer attention.
+There is no strong or consistent link between duration and total viewership. Most **movies** clustered around the 90–120 minute range, with a few shorter and longer outliers—yet both ends of the spectrum showed varying levels of engagement. **TV shows** were predominantly limited to one-season formats, with minimal variation across the dataset. This suggests that **binge-worthiness is not solely determined by length**. Elements such as content quality, genre, release timing, and episodic structure are likely more influential in sustaining viewer interest.
 
 ------------------------------------------------------------------------
 
 ### 🎯 Conclusion
 
-The analysis suggests that **viewer engagement on Netflix is influenced by a combination of genre, format, and content structure** — not any single factor. While popular genres like **comedies** and **dramas** consistently pull high viewership, others like **horror** and **sci-fi** perform better in specific formats (e.g. TV shows).
+The analysis indicates that **viewer engagement on Netflix is shaped by a combination of genre, format, and structural elements**, rather than any single factor. While widely popular genres like **comedies** and **dramas** consistently attract high viewership, others—such as **horror** and **sci-fi**—perform more strongly within specific formats (e.g., TV shows).
 
-The genre breakdown showed distinct preferences between **movies and series**, with audiences leaning toward emotional or family-friendly content in films, and suspenseful, episodic storytelling in shows. The duration comparison further revealed that **most movies fall in the 90–120 minute range**, while **TV shows cluster around 1–2 seasons**, though engagement doesn't necessarily scale with length.
+The genre breakdown revealed clear distinctions between **movies and series**, with films leaning toward emotional or family-friendly themes, and shows favouring suspenseful, episodic storytelling. The duration analysis further showed that **most movies run between 90–120 minutes**, while **TV shows typically span 1–2 seasons**, though engagement does not necessarily increase with length.
 
-For students exploring data storytelling, this example demonstrates how **public datasets can uncover cultural trends** and viewer behaviour. Simple preprocessing and visualisation choices — like separating genres or handling mixed-duration fields — often unlock deeper narratives hidden beneath the surface.
+For students exploring data storytelling, this project highlights how **public datasets can reveal cultural patterns** and viewing behaviour. Even simple preprocessing and visualisation choices—such as splitting mixed-duration fields or disaggregating genre labels—can uncover meaningful insights hidden in plain sight.
 
 ------------------------------------------------------------------------
 
 ### 📚 References
 
--   Netflix. [*What We Watched: A Netflix Engagement Report*.](https://www.netflix.com/whatwewatched)
+-   Netflix. [*What We Watched: A Netflix Engagement Report*.](https://about.netflix.com/en/news/what-we-watched-a-netflix-engagement-report)
 -   Kaggle. [*Netflix Movies and TV Shows Dataset*.](https://www.kaggle.com/datasets/shivamb/netflix-shows)
 
 <!-- Task 3 Tab: Behind the Scenes -  -->
 
 ## Behind the Scenes
 
-### **🧹 Genre Cleaning and Duration Parsing**
+### 🧹 Genre Cleaning and Duration Parsing
 
 **Tell us about a part(s) of your data processing or analysis that weren’t “sexy” and wouldn’t typically be included in a blog post. (e.g. Was there any data drudgery or time intensive wrangling? Were there any repetitive tasks or manual tasks? If it was easy, describe what made it easy?)**
 
@@ -477,7 +501,7 @@ A surprising amount of time went into cleaning the `duration` and `listed_in` co
 
 ------------------------------------------------------------------------
 
-### **🧩 Redesigning Visuals and Adjusting Scope**
+### 🧩 Redesigning Visuals and Adjusting Scope
 
 **Were there any challenges that you faced in conducting this analysis? These may take the form of data limitations or coding challenges. (e.g. Was there anything in your analysis that you were not anticipating when you started? Did you have to change your intended scope? Did you need to master a new skill? Were there any problems you were proud of solving?)**
 
@@ -485,9 +509,57 @@ There were multiple rounds of visualisation redesigns. The original plan was to 
 
 ------------------------------------------------------------------------
 
-### **🚀 Opportunities for Future Expansion**
+### 🚀 Opportunities for Future Expansion
 
 **Tell us about any imperfect parts of your work or how you would like to expand this analysis in future? (We don’t expect you to solve everything in one assignment.)**
 
 The dataset only included total viewing hours and lacked contextual metadata such as drop-off rates or regional viewing patterns. As a result, it was difficult to tell whether high engagement reflected popularity, rewatchability, or algorithmic promotion. In the future, it would be useful to bring in complementary data — such as country-level trends, viewer completion rates, or IMDb scores — to round out the picture and understand *why* certain shows succeeded.
+
+------------------------------------------------------------------------
+
+### 🧪 Iterative Process & Version History
+
+This project was developed through five saved versions, reflecting how both the analysis and communication evolved. Below is a brief summary of what changed at each stage:
+
+**Version 1 – Initial Write-Up Only**
+
+-   Drafted Tab 1 with research question, data sources, and collection process
+
+-   Focused on structuring ideas before adding any code or visuals
+
+-   Helped clarify project direction and key questions
+
+**Version 2 – Data Cleaning and Exploratory Code**
+
+-   Added early data wrangling and merging code in R
+
+-   Began exploring how to standardise duration and split genres
+
+-   Tested out plots to verify structure, most of which were later refined or discarded
+
+**Version 3 – Visualisations and Tables Added in Tab 2**
+
+-   Created final faceted bar charts and violin plots
+
+-   Added genre and format summary tables
+
+-   Focused on aligning visuals with story flow and improving interpretability
+
+**Version 4 – Tab 3 Reflections and Drafting**
+
+-   Wrote behind-the-scenes reflections for Tab 3
+
+-   Described challenges, scope shifts, and future opportunities
+
+-   Ensured tone was natural and authentic rather than AI-generated
+
+**Version 5 – Final Polish, Styling, and Documentation**
+
+-   Applied full custom CSS (Netflix theme, tab design, pastel code blocks)
+
+-   Edited all write-ups for grammar, clarity, and tone consistency
+
+-   Added AI acknowledgment (ChatGPT query link), and final section in Tab 3
+
+-   Included README and data description files to complete the submission
 :::
