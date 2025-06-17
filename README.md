@@ -33,7 +33,7 @@ These datasets were merged using a cleaned and standardised `title` field.
 - data/Netflix_Engagement_Report.xlsx  : Watch hour data from Netflix
 - assignment4_Yashitta_Bawa.qmd        : Main Quarto file (with blog tabs)
 - styles.css                           : Custom Netflix-themed stylesheet
-- data_description.xlsx                : Data dictionary and variable-level documentation
+- data_description.csv                 : Data dictionary and variable-level documentation
 - README.md                            : This file
 
 ------------------------------------------------------------------------
@@ -81,3 +81,14 @@ This analysis uses public, aggregate-level data. No individual users are represe
 7. Project Summary
 
 This submission includes all relevant code, documentation, visualisation, and reflections in a modular, reproducible Quarto file. All variables used are clearly documented in `data_description.xlsx`.
+
+------------------------------------------------------------------------
+
+8. Version History & Repository
+
+All five versions of this assignment — including exploratory drafts, code evolution, and final styling — are tracked in the linked GitHub repository.
+
+- GitHub (HTTPS): https://github.com/Yashitta/ETC-5512_Assignment_4.git  
+- GitHub (SSH): git@github.com:Yashitta/ETC-5512_Assignment_4.git
+
+Each version reflects a meaningful stage in development (e.g. draft write-up, visualisation, styling), as documented in the Quarto file and Git commit history.

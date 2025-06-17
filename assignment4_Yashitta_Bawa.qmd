@@ -521,7 +521,7 @@ The dataset only included total viewing hours and lacked contextual metadata suc
 
 This project was developed through five saved versions, reflecting how both the analysis and communication evolved. Below is a brief summary of what changed at each stage:
 
-**Version 1 – Initial Write-Up Only**
+**Version 1 – Initial Write-Up Only (f6bf9b9)**
 
 -   Drafted Tab 1 with research question, data sources, and collection process
 
@@ -529,7 +529,7 @@ This project was developed through five saved versions, reflecting how both the 
 
 -   Helped clarify project direction and key questions
 
-**Version 2 – Data Cleaning and Exploratory Code**
+**Version 2 – Data Cleaning and Exploratory Code (85bd5aa)**
 
 -   Added early data wrangling and merging code in R
 
@@ -537,7 +537,7 @@ This project was developed through five saved versions, reflecting how both the 
 
 -   Tested out plots to verify structure, most of which were later refined or discarded
 
-**Version 3 – Visualisations and Tables Added in Tab 2**
+**Version 3 – Visualisations and Tables Added in Tab 2 (bf6abd9)**
 
 -   Created final faceted bar charts and violin plots
 
@@ -545,7 +545,7 @@ This project was developed through five saved versions, reflecting how both the 
 
 -   Focused on aligning visuals with story flow and improving interpretability
 
-**Version 4 – Tab 3 Reflections and Drafting**
+**Version 4 – Tab 3 Reflections and Drafting (d62ef77)**
 
 -   Wrote behind-the-scenes reflections for Tab 3
 
@@ -553,7 +553,7 @@ This project was developed through five saved versions, reflecting how both the 
 
 -   Ensured tone was natural and authentic rather than AI-generated
 
-**Version 5 – Final Polish, Styling, and Documentation**
+**Version 5 – Final Polish, Styling, and Documentation (6d2a93b)**
 
 -   Applied full custom CSS (Netflix theme, tab design, pastel code blocks)
 
@@ -562,4 +562,7 @@ This project was developed through five saved versions, reflecting how both the 
 -   Added AI acknowledgment (ChatGPT query link), and final section in Tab 3
 
 -   Included README and data description files to complete the submission
+
+All versions of this assignment, including exploratory code, intermediate drafts, and final outputs, are available on GitHub:  
+[GitHub Repository](https://github.com/Yashitta/ETC-5512_Assignment_4.git)
 :::
