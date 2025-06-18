@@ -1,0 +1,262 @@
+---
+title: "Behind the Streams: What Viewers Actually Watch on Netflix"
+subtitle: "Assignment 4 ETC5512"
+author: Yashitta Bawa
+format: html
+editor: visual
+message: false
+warning: false
+---
+
+::: panel-tabset
+<!-- Task 1 Tab: Data and Documenting -->
+
+## Data Details
+
+### 🧠 Research Question
+
+This project explores the question: **What Viewers Actually Watch on Netflix?**
+
+The goal is to determine which types of content—such as genres, release formats, or show categories—tend to attract the highest viewership. Specifically, the analysis investigates:
+
+-   Whether certain genres (e.g., documentaries, thrillers, reality shows) sustain more viewer attention\
+-   Whether newer titles perform better than older ones\
+-   What common characteristics are shared by the most-watched shows
+
+This question was selected because streaming platforms like Netflix play a major role in everyday entertainment. Gaining insight into what makes certain content more engaging can help illuminate viewer preferences, binge-watching behavior, and content design strategies.
+
+------------------------------------------------------------------------
+
+### 📁 The Data
+
+Two datasets were used in this project:
+
+1.  **Netflix Engagement Report (Jan–Jun 2023)**\
+    This dataset, published by Netflix, includes total hours watched globally for each title, along with release dates. It reflects real-world viewership patterns and provides a direct measure of audience engagement.
+
+2.  **Netflix Titles Metadata (from Kaggle)**\
+    This dataset contains descriptive information about Netflix content, including title, type (TV show or movie), duration (either runtime in minutes or number of seasons), genre categories, and release year.
+
+These datasets were selected because they are **publicly available**, nclude the **relevant variables** needed to address the research question, and are **up-to-date** as of 2023.
+
+They are appropriate for the intended analysis because:
+
+-   The engagement data directly captures viewer attention
+
+-   The metadata allows for grouping by format and genre
+
+-   Both datasets are observational and structurally compatible after cleanings
+
+**Licensing**:
+
+-   The engagement report is published by Netflix and is freely downloadable from the Netflix What We Watched site
+
+-   The titles dataset is available on Kaggle under a public license
+
+------------------------------------------------------------------------
+
+### 🛠️ Data Collection and Preparation
+
+**Data Download Process:**
+
+1.  **Netflix Engagement Report (Jan–Jun 2023):**
+
+-   Go to: [Netflix What We Watched](https://about.netflix.com/en/news/what-we-watched-a-netflix-engagement-report)
+-   Scroll down to the line **Download the report here**.
+-   Click the **here** text to download the Excel file (`Netflix_Engagement_Report.xlsx`).
+-   Save it into your project’s `data` folder.
+
+2.  **Netflix Metadata (from Kaggle):**
+
+-   Go to: [Kaggle Netflix Titles Dataset](https://www.kaggle.com/datasets/shivamb/netflix-shows)
+-   Log in to Kaggle (you’ll need an account).
+-   Click the blue **Download** button on the top-right corner.
+-   Save the `netflix_titles.csv` file into your project’s `data` folder.
+
+**Data Cleaning and Processing:**
+
+-   The engagement report included a non-tabular header section, which was skipped.
+
+-   Column names were cleaned and standardized using the `janitor` package.
+
+-   The `title` column was standardized across both datasets by converting text to lowercase and trimming white space.
+
+-   Only relevant variables were retained, including title, hours viewed, release date, genre, and type.
+
+-   The two datasets were merged using the cleaned `title` column.
+
+-   Some shows appeared multiple times in the engagement data (e.g., one row per season). These entries were retained for more granular analysis.
+
+-   The `duration` column indicates runtime in minutes for movies and season count for TV shows, which limits direct comparisons across formats.
+
+These steps ensured the datasets were clean, merged, and ready for structured analysis and visualization.
+
+```{r}
+# Loaded required libraries
+library(tidyverse)
+library(readxl)
+library(here)
+library(janitor)
+library(scales)
+library(ggridges)
+library(patchwork)
+
+# Loaded the datasets
+titles <- read_csv(here("data/netflix_titles.csv")) %>% 
+  clean_names()
+engagement_report <- read_excel(here("data/Netflix_Engagement_Report.xlsx"), 
+                                     skip = 5) %>% 
+  clean_names()
+
+# Standardised the titles for merging
+titles <- titles %>%
+  mutate(title_clean = str_to_lower(str_trim(title)))
+
+engagement_report <- engagement_report %>%
+  mutate(title_clean = str_to_lower(str_trim(title)),
+    release_year = lubridate::year(release_date))
+
+# Merged datasets using a left join
+netflix_clean <- left_join(engagement_report, titles, by = "title_clean") %>%
+  filter(!is.na(type), !is.na(duration), !is.na(listed_in)) %>%
+  mutate(
+    release_year = lubridate::year(release_date)) %>%
+  select(title = title.x,
+         release_date,
+         hours_viewed,
+         release_year,
+         type, 
+         duration, 
+         listed_in)
+
+# Added a new column with season removed
+netflix_clean <- netflix_clean %>%
+  mutate(base_title = str_remove(title, ": Season \\d+|: Limited Series"))
+
+# Group by base title + genre/type and summarise
+netflix_grouped <- netflix_clean %>%
+  group_by(base_title, type, listed_in) %>%
+  summarise(
+    total_hours = sum(hours_viewed, na.rm = TRUE),
+    .groups = "drop")
+
+# Separated movie duration (in minutes) and show duration (season count)
+netflix_clean <- netflix_clean %>%
+  mutate(
+    duration_num = parse_number(duration),
+    duration_type = case_when(
+      str_detect(duration, "min") ~ "minutes",
+      str_detect(duration, "Season") ~ "seasons",
+      TRUE ~ "unknown"))
+```
+
+------------------------------------------------------------------------
+
+### 📊 Dataset Creation for Visualisation
+
+**Genre Breakdown: Most Watched Categories Overall**
+
+To identify which genres attract the highest viewership, multi-genre entries were separated, and total hours viewed were aggregated for each individual genre.
+
+To explore trends across formats, the dataset was further grouped by both `type` (Movie or TV Show) and `genre`. The top 10 genres for each format were selected based on total viewing hours, then combined into a single dataset to allow visual comparison. While some genres appeared in both lists (e.g., Dramas, Sci-Fi & Fantasy), others were format-specific—such as Crime TV Shows or Romantic Movies.
+
+This preparation enabled a clear side-by-side breakdown of audience preferences by format, visualised through a faceted bar chart in the blog post tab. The plot reveals which genres perform better within each format and illustrates how structural differences in content influence viewership.
+
+```{r}
+genre_summary <- netflix_clean %>%
+  separate_rows(listed_in, sep = ",\\s*") %>%
+  group_by(listed_in) %>%
+  summarise(total_hours = sum(hours_viewed, na.rm = TRUE)) %>%
+  arrange(desc(total_hours)) %>%
+  slice_head(n = 10)
+
+# Preprocess genre order
+genre_summary <- genre_summary %>%
+  mutate(listed_in = factor(listed_in, 
+                            levels = listed_in[order(total_hours)]))
+```
+
+**Genre Preferences by Format**
+
+To compare viewership patterns between TV shows and movies, titles were grouped by type, and summary statistics—such as mean and median hours viewed—were calculated.
+
+To further examine genre-based viewing trends across formats, titles were grouped by both `type` and `genre`, and total viewing hours were aggregated.\
+
+The top 10 genres for each format were then selected to showcase the most popular categories, with overlapping genres retained to allow comparison.
+
+This data was used to create a **side-by-side faceted bar chart**, displaying the top genres by total hours viewed for **movies** on the left and **TV shows** on the right.\
+
+The layout highlights which genres perform better within each content format.
+
+```{r}
+format_summary <- netflix_clean %>%
+  group_by(type) %>%
+  summarise(
+    mean_hours = mean(hours_viewed, na.rm = TRUE),
+    median_hours = median(hours_viewed, na.rm = TRUE),
+    count = n())
+
+# Full summary of genres by format
+genre_all <- netflix_clean %>%
+  separate_rows(listed_in, sep = ",\\s*") %>%
+  group_by(type, genre = listed_in) %>%
+  summarise(hours_viewed = sum(hours_viewed, na.rm = TRUE), .groups = "drop")
+
+# Top 10 Movie genres
+top_movie_genres <- genre_all %>%
+  filter(type == "Movie") %>%
+  arrange(desc(hours_viewed)) %>%
+  slice_head(n = 10) %>%
+  pull(genre)
+
+# Top 10 TV genres
+top_tv_genres <- genre_all %>%
+  filter(type == "TV Show") %>%
+  arrange(desc(hours_viewed)) %>%
+  slice_head(n = 10) %>%
+  pull(genre)
+
+# Combine all 20 genres (with overlap if any)
+selected_genres <- union(top_movie_genres, top_tv_genres)
+
+# Final dataset: includes Movie + TV rows for those 20 genres
+genre_by_type <- genre_all %>%
+  filter(genre %in% selected_genres)
+```
+
+**Duration vs. Format**
+
+To explore how content length varies between movies and TV shows, the `duration` column was cleaned and split into two distinct units: **minutes** (for movies) and **seasons** (for TV shows). These values were extracted numerically and stored in a new column called `duration_num`.
+
+Entries labelled as "other" or missing type/duration values were filtered out to create a consistent dataset for comparing structural differences in content length.
+
+The cleaned dataset was then split by format (`Movie` vs `TV Show`) and visualised using **violin plots**. Each plot displays the distribution of durations across titles, offering insight into how runtime conventions differ by format.
+
+For instance, movies typically range from 90–120 minutes, while most TV shows cluster around 1–2 seasons. This transformation supports a focused visualisation of **duration norms** and lays the foundation for analysing their relationship with viewer engagement.
+
+```{r}
+duration_clean <- netflix_clean %>%
+  mutate(
+    duration_num = readr::parse_number(duration),
+    duration_type = case_when(
+      str_detect(duration, "min") ~ "minutes",
+      str_detect(duration, "Season") ~ "seasons",
+      TRUE ~ "other")) %>%
+  filter(!is.na(duration_num))
+
+# Clean duration data
+duration_clean <- netflix_clean %>%
+  filter(!is.na(duration), 
+         !is.na(type)) %>%
+  mutate(
+    duration_num = case_when(
+      str_detect(duration, "min") ~ parse_number(duration),
+      str_detect(duration, "Season") ~ parse_number(duration),
+      TRUE ~ NA_real_),
+    duration_unit = case_when(
+      str_detect(duration, "min") ~ "Minutes",
+      str_detect(duration, "Season") ~ "Seasons",
+      TRUE ~ "Other")) %>%
+  filter(!is.na(duration_num), 
+         duration_unit != "Other")
+```

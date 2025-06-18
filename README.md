@@ -32,6 +32,7 @@ These datasets were merged using a cleaned and standardised `title` field.
 - data/netflix_titles.csv              : Metadata file from Kaggle
 - data/Netflix_Engagement_Report.xlsx  : Watch hour data from Netflix
 - assignment4_Yashitta_Bawa.qmd        : Main Quarto file (with blog tabs)
+- versions			       : Folder containing .qmd files for Versions 1 to 4, documenting the iterative development process
 - styles.css                           : Custom Netflix-themed stylesheet
 - data_description.csv                 : Data dictionary and variable-level documentation
 - README.md                            : This file
@@ -92,3 +93,5 @@ All five versions of this assignment — including exploratory drafts, code evol
 - GitHub (SSH): git@github.com:Yashitta/ETC-5512_Assignment_4.git
 
 Each version reflects a meaningful stage in development (e.g. draft write-up, visualisation, styling), as documented in the Quarto file and Git commit history.
+
+Note: Alongside the GitHub repository, .qmd files for each version (v1 to v4) have also been included in this submission to document the iterative process.
