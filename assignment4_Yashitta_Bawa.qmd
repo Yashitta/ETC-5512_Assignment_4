@@ -527,7 +527,7 @@ There were multiple rounds of visualisation redesigns. The original plan was to 
 
 **Tell us about any imperfect parts of your work or how you would like to expand this analysis in future? (We don’t expect you to solve everything in one assignment.)**
 
-The dataset only included total viewing hours and lacked contextual metadata such as drop-off rates or regional viewing patterns. As a result, it was difficult to tell whether high engagement reflected popularity, rewatchability, or algorithmic promotion. In the future, it would be useful to bring in complementary data — such as country-level trends, viewer completion rates, or IMDb scores — to round out the picture and understand *why* certain shows succeeded.
+The dataset only had total viewing hours, with no extra context like how many people actually finished the show or where people were watching from. So, it was pretty hard to tell if high engagement meant the show was really popular, super rewatchable, or just pushed a lot by Netflix’s algorithm. In future work, it’d help to bring in other data—like country-wise trends, how many viewers watched till the end, or even IMDb ratings—to get a better idea of *why* certain titles did well.
 
 ------------------------------------------------------------------------
 
